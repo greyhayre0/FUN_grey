@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Хэллоуинский светильник</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Arial', sans-serif;
+            overflow: hidden;
+            height: 100vh;
+            transition: background-color 4s ease;
+            position: relative;
+            background-color: #000;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(139, 0, 0, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 90% 80%, rgba(139, 0, 0, 0.1) 0%, transparent 20%),
+                radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0) 0%, #000 100%);
+        }
+        
+        .container {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            z-index: 2;
+        }
+        
+        .fact {
+            color: #ff8c00;
+            font-size: 2.2rem;
+            text-shadow: 
+                0 0 10px #ff4500,
+                0 0 20px #ff4500,
+                0 0 30px #8b0000,
+                0 0 40px #8b0000;
+            opacity: 0;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            text-align: center;
+            max-width: 80%;
+            font-family: 'Creepster', cursive, 'Courier New', monospace;
+            letter-spacing: 3px;
+            line-height: 1.4;
+            transition: opacity 4s ease-in-out;
+            filter: drop-shadow(0 0 5px rgba(255, 69, 0, 0.7));
+        }
+        
+        .flash {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(255,140,0,0.8) 0%, transparent 70%);
+            opacity: 0;
+            pointer-events: none;
+            z-index: 10;
+            transition: opacity 0.3s;
+            mix-blend-mode: screen;
+        }
+        
+        .ghost {
+            position: absolute;
+            font-size: 4rem;
+            opacity: 0;
+            transition: opacity 0.5s, transform 0.5s;
+            z-index: 5;
+            filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.7));
+            transform: scale(0.8) rotate(10deg);
+        }
+        
+        .intensity-control {
+            position: absolute;
+            bottom: 30px;
+            right: 30px;
+            width: 200px;
+            opacity: 0.0;
+            transition: opacity 0.5s ease;
+            z-index: 20;
+        }
+        
+        .intensity-control:hover {
+            opacity: 0.8;
+        }
+        
+        .intensity-slider {
+            width: 100%;
+            height: 6px;
+            -webkit-appearance: none;
+            background: rgba(255,69,0,0.2);
+            border-radius: 3px;
+            outline: none;
+        }
+        
+        .intensity-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff7518;
+            cursor: pointer;
+            border: 2px solid rgba(255,69,0,0.5);
+            box-shadow: 0 0 10px #ff4500;
+        }
+        
+        .intensity-slider::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ff7518;
+            cursor: pointer;
+            border: 2px solid rgba(255,69,0,0.5);
+            box-shadow: 0 0 10px #ff4500;
+        }
+        
+        .intensity-label {
+            color: rgba(255,140,0,0.7);
+            font-size: 0.8rem;
+            margin-bottom: 5px;
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px rgba(255,69,0,0.5);
+        }
+        
+        .music-control {
+            position: absolute;
+            bottom: 80px;
+            right: 30px;
+            width: 250px;
+            opacity: 0.3;
+            transition: opacity 0.5s ease;
+            z-index: 20;
+        }
+        
+        .music-control:hover {
+            opacity: 0.8;
+        }
+        
+        .music-button {
+            background: rgba(139, 0, 0, 0.3);
+            border: 1px solid rgba(255, 69, 0, 0.5);
+            color: #ff8c00;
+            padding: 8px 15px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            text-shadow: 0 0 5px rgba(255, 69, 0, 0.5);
+            box-shadow: 0 0 10px rgba(255, 69, 0, 0.3);
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 5px;
+        }
+        
+        .music-button:hover {
+            background: rgba(139, 0, 0, 0.5);
+            box-shadow: 0 0 15px rgba(255, 69, 0, 0.5);
+        }
+        
+        .music-info {
+            color: rgba(255,140,0,0.7);
+            font-size: 0.8rem;
+            text-align: center;
+            font-family: 'Courier New', monospace;
+            text-shadow: 0 0 5px rgba(255,69,0,0.5);
+        }
+        
+        .track-list {
+            max-height: 100px;
+            overflow-y: auto;
+            margin-top: 5px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 5px;
+            padding: 5px;
+        }
+        
+        .track-item {
+            color: rgba(255,140,0,0.7);
+            font-size: 0.7rem;
+            padding: 2px 5px;
+            cursor: pointer;
+            border-radius: 3px;
+            margin: 2px 0;
+        }
+        
+        .track-item:hover {
+            background: rgba(255,69,0,0.2);
+        }
+        
+        .track-item.active {
+            background: rgba(255,69,0,0.3);
+            color: #ff8c00;
+        }
+        
+        .particle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 1;
+            will-change: transform, opacity;
+        }
+        
+        .spark {
+            background: radial-gradient(circle, #ff8c00, #ff4500, transparent);
+            border-radius: 50%;
+            box-shadow: 0 0 10px 2px #ff4500;
+        }
+        
+        .spirit {
+            background: radial-gradient(circle, rgba(255,255,255,0.9), rgba(173,216,230,0.4), transparent);
+            border-radius: 50%;
+            filter: blur(1px);
+            box-shadow: 0 0 15px 3px rgba(255,255,255,0.5);
+        }
+        
+        .ember {
+            background: radial-gradient(circle, #ff0000, #8b0000, transparent);
+            border-radius: 50%;
+            filter: blur(0.5px);
+            box-shadow: 0 0 8px 2px #8b0000;
+        }
+        
+        .magic {
+            background: radial-gradient(circle, #8a2be2, #4b0082, transparent);
+            border-radius: 50%;
+            filter: blur(1.5px);
+            box-shadow: 0 0 12px 3px #8a2be2;
+        }
+        
+        .web {
+            background: 
+                radial-gradient(ellipse, rgba(255,255,255,0.5) 0%, transparent 70%),
+                repeating-linear-gradient(45deg, transparent, transparent 5px, rgba(255,255,255,0.1) 5px, rgba(255,255,255,0.1) 10px);
+            filter: blur(0.8px);
+            border-radius: 50%;
+        }
+        
+        .bat {
+            position: absolute;
+            width: 30px;
+            height: 20px;
+            background: 
+                radial-gradient(ellipse at 30% 50%, #222 0%, #000 70%);
+            border-radius: 50%;
+            clip-path: polygon(0% 0%, 100% 0%, 80% 50%, 100% 100%, 0% 100%, 20% 50%);
+            filter: drop-shadow(0 0 3px rgba(255,69,0,0.5));
+            opacity: 0;
+            z-index: 3;
+        }
+        
+        .silhouette {
+            position: absolute;
+            bottom: 0;
+            width: 100px;
+            height: 150px;
+            background: radial-gradient(ellipse at 50% 100%, rgba(0,0,0,0.8) 0%, transparent 70%);
+            filter: blur(3px);
+            opacity: 0.3;
+            z-index: 1;
+        }
+        
+        .instructions {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            color: rgba(255,140,0,0.5);
+            font-size: 0.9rem;
+            text-align: left;
+            text-shadow: 0 0 5px rgba(255,69,0,0.3);
+        }
+        
+        /* Анимация мерцания текста */
+        @keyframes text-flicker {
+            0% { opacity: 0.8; text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500, 0 0 30px #8b0000, 0 0 40px #8b0000; }
+            5% { opacity: 0.9; text-shadow: 0 0 12px #ff4500, 0 0 22px #ff4500, 0 0 32px #8b0000, 0 0 42px #8b0000; }
+            10% { opacity: 0.6; text-shadow: 0 0 8px #ff4500, 0 0 18px #ff4500, 0 0 28px #8b0000, 0 0 38px #8b0000; }
+            15% { opacity: 0.95; text-shadow: 0 0 13px #ff4500, 0 0 23px #ff4500, 0 0 33px #8b0000, 0 0 43px #8b0000; }
+            20% { opacity: 0.7; text-shadow: 0 0 9px #ff4500, 0 0 19px #ff4500, 0 0 29px #8b0000, 0 0 39px #8b0000; }
+            25% { opacity: 1; text-shadow: 0 0 15px #ff4500, 0 0 25px #ff4500, 0 0 35px #8b0000, 0 0 45px #8b0000; }
+            30% { opacity: 0.6; text-shadow: 0 0 8px #ff4500, 0 0 18px #ff4500, 0 0 28px #8b0000, 0 0 38px #8b0000; }
+            35% { opacity: 0.9; text-shadow: 0 0 12px #ff4500, 0 0 22px #ff4500, 0 0 32px #8b0000, 0 0 42px #8b0000; }
+            40% { opacity: 0.7; text-shadow: 0 0 9px #ff4500, 0 0 19px #ff4500, 0 0 29px #8b0000, 0 0 39px #8b0000; }
+            45% { opacity: 0.85; text-shadow: 0 0 11px #ff4500, 0 0 21px #ff4500, 0 0 31px #8b0000, 0 0 41px #8b0000; }
+            50% { opacity: 0.8; text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500, 0 0 30px #8b0000, 0 0 40px #8b0000; }
+            100% { opacity: 0.8; text-shadow: 0 0 10px #ff4500, 0 0 20px #ff4500, 0 0 30px #8b0000, 0 0 40px #8b0000; }
+        }
+        
+        .flicker {
+            animation: text-flicker 3s infinite;
+        }
+    </style>
+    <link href="https://fonts.googleapis.com/css2?family=Creepster&display=swap" rel="stylesheet">
+</head>
+<body>
+    <div class="container">
+        <div class="fact" id="fact"></div>
+    </div>
+    
+    <div class="intensity-control">
+        <button class="music-button" id="musicButton">🎵 Поиск музыки</button>
+        <div class="music-info" id="musicInfo">Идет поиск mp3 файлов...</div>
+        <div class="track-list" id="trackList"></div>
+        <input type="range" min="0.1" max="1" value="0.7" step="0.05" class="intensity-slider" id="intensitySlider">
+    </div>
+    
+   
+    
+    <div class="flash" id="flash"></div>
+    
+    <script>
+        // Элементы
+        const body = document.body;
+        const flash = document.getElementById('flash');
+        const factElement = document.getElementById('fact');
+        const intensitySlider = document.getElementById('intensitySlider');
+        const musicButton = document.getElementById('musicButton');
+        const musicInfo = document.getElementById('musicInfo');
+        const trackList = document.getElementById('trackList');
+        
+        // Текущая интенсивность
+        let intensity = 0.7;
+        
+        // Аудио
+        let audio = null;
+        let isPlaying = false;
+        let currentTrackIndex = 0;
+        let musicFiles = [];
+        
+        // Факты о Хэллоуине
+        // Факты о Хэллоуине
+        const halloweenFacts = [
+                    " Кельты знали: в ночь Самайна грань между мирами истончается. Мертвые могут вернуться. Шепот из пустоты — не ветер. Они стучатся в твою дверь. Ты ответишь?",
+                    "Стингy Джек обманул дьявола и был обречен скитаться с углем в репе. Его проклятая душа ищет тело. Его горящие глаза видны в окне. Он хочет твою душу.",
+                    "Изначально фонари вырезали из репы. Их души были злее. Они не освещали путь, а заманивали в болота. Туда, где до сих пор ждут.",
+                    "Оранжевый — цвет урожая. Черный — цвет тьмы. В Хэллоуин они сливаются. То, что приходит на их стыке, не имеет имени, только голод.",
+                    "«Сладость или гадость» — не игра. Это старый договор. Откупись угощением, или они войдут в твой дом и заберут нечто большее, чем конфеты.",
+                    "Первый костюм был не для веселья. Люди надевали маски, чтобы духи приняли их за своих. Но что, если духи теперь носят маски людей?",
+                    "В День Мертвых умершие посещают живых. Они садятся за стол, едят, улыбаются. Но некоторые духи приходят не из любви. Они приходят заменить кого-то из семьи.",
+                    "Тыква-гигант весила тонну. Внутри вырезали одну ухмылку. Но когда погасли все огни, из тыквы послышалось тихое дыхание. Она была живой.",
+                    "Хэллоуин — второй по популярности праздник. Потому что Рождество празднуют живые. А в эту ночь голосуют мертвые. Их большинство.",
+                    "В Средневековье выпрашивали «духовные пирожки» для душ в чистилище. Но если пирожок падал на землю, его съедала не та душа. И она шла за тобой по пятам.",
+                    "Черный кот — не к невезению. Он — проводник. Он видит, кто из твоих гостей не отбрасывает тень. И мурлычет, указывая на него.",
+                    "В Салеме, городе ведьм, празднества самые масштабные. Потому что местные духи не просто декорации. Они активные участники. И они выбирают, с кем пойти домой.",
+                    "Первый коммерческий костюм купили в 1930-х. Он был дешевым. Говорят, в нем уже кто-то был. Покупатель исчез, но костюм до сих пор кочует по вечеринкам.",
+                    "Друиды разжигали костры, чтобы отогнать тьму. Но пламя привлекало не только людей. Из леса выходили тени выше деревьев и садились у огня.",
+                    "Яблоко — фрукт Помоны, богини изобилия. В игре «вылавливание яблок» проигрывает тот, кто вытащит плод с червоточиной. Это знак. Богиня отвернулась. Урожай следующего года — твоя душа.",
+                    "В Шотландии использовали брюкву. Ее кривые, искаженные лица впитывали зло. Если такой фонарь разбить, зло вырвется на свободу и вселится в первого, кто вдохнет пыль.",
+                    "Рекорд по резке тыквы — 16 секунд. Нож движется так быстро, что тыква не успевает понять, что умерла. Ее дух мстит. Все ножи в доме тупеют.",
+                    "Фестиваль Голодных духов в Китае. Голодные духи не просто бродят. Они хотят есть. А единственная пища, что может их насытить — тепло твоей жизни.",
+                    "Приюты не отдают черных кошек. Не из-за суеверий. Они знают: в эту ночь их забирают не для любви. Их нужны для обрядов, требующих жертвы.",
+                    "Фильм «Хэллоуин» снят с крошечным бюджетом. Актеры говорили, что в костюме Майерса было невыносимо холодно. Потому что внутри был не актер.",
+                    "«Гуингинг» — ношение костюмов. Но чем страшнее маска, тем больше она нравится духам. Они прилипают к ней. И после праздника остаются с тобой.",
+                    "3 миллиарда долларов на костюмы. Деньги пахнут страхом и азартом. Этот запах приманивает тех, для кого Хэллоуин — не праздник, а ночь охоты.",
+                    "Шоколадные батончики — самые популярные. Дети рады. Но старики шепчут: сахар и какао маскируют вкус древних подношений. Ты ешь не конфету, а обряд.",
+                    "В Ирландии играют в карты на деньги. Говорят, если ты постоянно проигрываешь, твою ставку делает за тебя невидимый игрок. И однажды он захочет забрать свой выигрыш.",
+                    "Призрак — популярный костюм. Надевая его, ты становишься пустым сосудом. Кто-то или что-то может заглянуть внутрь. И остаться.",
+                    "Если на тебя упадет паук в Хэллоуин — это дух умершего любимого. Он хочет быть ближе. Он будет следовать за тобой в каждом пауке, которого ты увидишь.",
+                    "Канди-корн был белым, оранжевым и коричневым. Белый — цвет костей. Оранжевый — урожая. Коричневый — высохшей крови. Настоящий рецепт забыт. И слава богу.",
+                    "Парад взрослых в Оклахома-Сити. Взрослые отпускают свои запреты. Но в эту ночь за освобожденной душой всегда приходит что-то еще. И оно вселяется.",
+                    "«Ведьма» значит «мудрая женщина». Их мудрость была в умении говорить с тем, что по ту сторону. Они до сих пор шепчут. Ты слышишь?",
+                    "Праздник Помоны слился с Самайном. Богиня фруктов дарит изобилие. Но ее плоды имеют душу. Съедая яблоко, ты съедаешь чью-то бессмертную сущность.",
+                    "35 миллионов детей стучатся в двери. Среди них есть те, кто не отбрасывает тени. Они не пришли за конфетами. Они пришли найти новый дом.",
+                    "Тыква — ягода. Внутри каждой ягоды есть семена. Но в хэллоуинской тыкве семена прорастают не в земле. Они прорастают в твоих снах.",
+                    "Джек-о-фонарь весом в 1190 кг. Такой сосуд может вместить не одну свечу, а тысячи душ. Если ночью ты услышишь из него хор — беги.",
+                    "«Гадость» в XIX веке включала вредительство. Дети били стекла. Но старики помнят: ту ночь, когда разбилось каждое окно в городе. Наутро дети были другие.",
+                    "В Англии дети вырезали «свеклу-фонарь». Их руки были черны от земли. Говорили, это не грязь, а тень от прикосновения духа, что учил их резать.",
+                    "Костюм ведьмы самый популярный. Миллионы женщин становятся ею на одну ночь. А у настоящих ведьм есть правило: если наденешь их лик — они наденут твой.",
+                    "В 1950-х Хэллоуин превращали в праздник для соседей. Чтобы все были вместе. Чтобы духи не могли отличить живых от мертвых в толпе.",
+                    "Некоторые христиане не празднуют его. Они говорят, что не открывают дверь для незваных гостей. Они правы. Дверь работает в обе стороны.",
+                    "На Фестивале Голодных духов в Гонконге сжигают бумажные деньги. Деньги для мертвых. Иногда мертвые приходят за долгом. Их валюта — годы твоей жизни.",
+                    "Гадание на яблочной кожуре: брось ее, чтобы увидеть букву суженого. Но кожура может сложиться в твою собственную букву. Это не суженый. Это твоя смерть.",
+                    "Анока — «столица Хэллоуина». Духи об этом знают. Каждый год они проводят там свой парад. Ты просто не всегда можешь его увидеть.",
+                    "Фраза «сладость или гадость» впервые напечатана в 1927-м. В той же газете были заметки о пропавших детях. Совпадение? Не в эту ночь.",
+                    "В Японии Хэллоуин стал популярен благодаря паркам. Но в парках аттракционы — бутафория. А призраки, что пришли на зов, — настоящие.",
+                    "Ирландские иммигранты привезли праздник в Америку. Они привезли в трюмах кораблей не только традиции.",
+                    "«Ночь шалостей» — ночь вандализма. Но самые страшные надписи на стенах рисуют не дети. Их рисует чья-то костлявая рука.",
+                    "Самый большой парад в Гринвич-Виллидж. Тысячи людей в костюмах. К утру все расходятся. Почти все. Некоторые костюмы так и продолжают идти по улицам. Пустые.",
+                    "В Германии прячут ножи. Чтобы духи не поранились. Ложь. Чтобы духи, вселившиеся в живых, не смогли ими воспользоваться.",
+                    "Каждый шестой америнец наряжает питомца. Животные видят то, что скрыто от нас. Их вой или шипение в эту ночь — не игра. Они видят твоего двойника.",
+                    "«Souling» — выпрашивание «духовных пирожков». Если тебе давали пирожок, душа молилась за дарителя. Если нет — душа проклинала его род на семь поколений.",
+                    "Джек Скеллингтон — «Тыквенный король». Он хотел понять Рождество. А ты уверен, что он не хочет понять, что скрывается в сердце твоей семьи?",
+                    "В Канаде продают 5 миллионов кг конфет. Сладкая гора, приманивающая всех. В том числе и тех, чей голод не утолить шоколадом. Им нужна плоть.",
+                    "Вампиры не видят отражения, ведь зеркала были из серебра. Сейчас зеркала другие. Они видят. И они улыбаются, проходя мимо.",
+                    "Ламия, демон из Древней Греции, пожирала детей. Ее дети живы. Им нравится, когда дети наряжаются в костюмы. Их так легче увести.",
+                    "Зажги тыкву от свечи в окне, чтобы духи нашли путь домой. А если свеча в твоем окне погасла? Значит, духи уже внутри. И они не уйдут.",
+                    "Слухи об отравленных конфетах в 70-х. Ни один случай не подтвердили. Потому что это были не конфеты. Дети исчезали, оставляя лишь горсть леденцов.",
+                    "В Шотландии бросали в огонь ореховую скорлупу. Если орехи сгорали вместе — пара будет счастлива. Если разлетались — нет.",
+                    "9 миллиардов долларов на Хэллоуин. Экономика страха. Самая стабильная валюта. Потому что страх — это то, что никогда не закончится.",
+                    "В Ирландии пекут хлеб «Бармбрэк» с сюрпризами. Кольцо — к свадьбе. Горошина — к бедности. А если найдешь тряпичную куклу? Ты стал новым домом.",
+                    "Бриллиантовый костюм за 2 миллиона. Блеск камней ослепляет. В их сиянии ты не заметишь, как что-то древнее и жадное переберется с костюма на твою кожу.",
+                    "В Древнем Вавилоне боялись демонов, вселяющихся через тень. В Хэллоуин тени длиннее. И они не всегда повторяют твои движения. Иногда они живут своей жизнью.",
+                    "Подбрасывание яблок в воду символизировало переход в иной мир. Если яблоко тонуло, значит, мир мертвых отверг душу. Она оставалась с тобой. Навсегда.",
+                    "В Румынии водят туры в замок Дракулы. Настоящий граф не в замке. Он пользуется суматохой и приезжает с туристами. В виде одного из них.",
+                    "35% взрослых Americans устраивают вечеринки. Шум, музыка, смех. Идеальная маскировка для тихих голосов, которые говорят из угла комнаты. Только ты их слышишь.",
+                    "В Уэльсе является белая дама с косой. Она не приходит за стариками. Она приходит за теми, кто прожил так мало, что даже смерть не заметит их исчезновения.",
+                    "Первый массовый джек-о-фонарь — 1892 год. С тех пор они сходят с конвейера. И с каждым годом ухмылки на их лицах становятся все злее и настоящие.",
+                    "В Италии оставляют еду для духов предков. Но пахнет еда и для других гостей. Тех, кого в семье не ждали. Они входят без стука.",
+                    "44 миллиона домохозяйств раздают конфеты. 44 миллиона открытых дверей. Статистика для потусторонних сил — не просто цифры. Это план охоты.",
+                    "В Канаде Хэллоуин — второй по популярности. Потому что зима там длинная и темная. А тьма любит, когда ее празднуют.",
+                    "Самый большой тыквенный пирог весил 900 кг. Чтобы его испечь, нужны были души. Повара говорили, что это шутка. Но откуда тогда шепот из начинки?",
+                    "В Польше в Хэллоуин посещают могилы и оставляют свечи. Свет должен указать путь предкам. Но он также может и ослепить их. И они пойдут не туда. К тебе домой.",
+                    "«Сумасшедшие ночи» с вандализмом привели к комендантскому часу. Власти думали, что это хулиганы. Они не видели, как тени сами ломают фонари и рисуют на асфальте.",
+                    "Корейский Чусок — день почитания предков. Но предки бывают разные. Некоторые приходят не для благословения, а чтобы забрать долг. Их долг — твоя жизнь.",
+                    "Фермы, выращивающие тыквы. Они поливают их не просто водой. Земля помнит старые кельтские обряды. И тыквы растут, уже зная, что внутри них будут жечь свечи.",
+                    "В Испании День всех святых — для посещения кладбищ. Тишина, свечи, цветы. И шепот из-за могильной плиты.",
+                    "В 1919 году Хэллоуин чуть не отменили из-за гриппа. Болезнь отступила. Говорят, ей не понравилась конкуренция с более древней заразой, что ходит в эту ночь.",
+                    "В Японии популярны аниме-костюмы. Яркие, нереальные. Идеальная маскировка для существ, у которых нет истинной формы. Они рады такой возможности.",
+                    "Тыква на 90% из воды. Вода — проводник. В хэллоуинскую ночь жидкость внутри тыквы становится зеркалом. И из него на тебя смотрит не твое отражение.",
+                    "На Филиппинах рассказывают страшные истории. После каждой истории зажигают свечу. Однажды свечи закончатся. И последнюю историю расскажет кто-то из темноты.",
+                    "В Древнем Египте кошек мумифицировали. Их души охраняли дома. Но если мумию потревожить, душа пробуждается злой. И она больше не защитник.",
+                    "Рекорд по сбору конфет — 21,2 кг. Мальчик тащил тяжелый мешок. Наутро в мешке не было конфет. Только земля и кости. Он тащил чью-то могилу.",
+                    "В Чехии ставят стулья для духов. Если утром ты найдешь один стул перевернутым, не трогай его. Дух, сидевший на нем, зол. И он еще здесь.",
+                    "Сахарную вату изобрел стоматолог. Сладкая паутина, портящая зубы. Идеальная ловушка. В Хэллоуин ее нити не тают. Они опутывают жертву для древнего паука.",
+                    "В Салеме есть музей ведьм. Экспонаты — куклы. Ночные сторожа слышат, как куклы шепчутся. Они называют имена посетителей, которые придут в следующем году.",
+                    "В России Хэллоуин не приветствуется. Православная церковь права. Они знают: в эту ночь открываются не те врата. И ключ от них — в каждой тыкве.",
+                    "Костюм тыквы для питомца. Животное в клетке из собственного наряда. Они видят, как ты смеешься. Они никогда этого не простят.",
+                    "В Ирландии до сих пор жгут костры. Пламя отпугивает духов. Но что, если однажды огонь погаснет слишком быстро? И в клубах дыма ты увидишь больше лиц, чем должно быть.",
+                    "20 миллионов кг канди-корна в год. Кукуруза — символ урожая и жертвоприношения. Каждая конфета — молчаливое соглашение. Ты принимаешь угощение — принимаешь и правила их игры.",
+                    "В Китае сжигают бумажные деньги для голодных духов. Пепел кружится в воздухе. Если он коснется твоего лица, ты станешь их должником. Они придут за оплатой.",
+                    "«Сумасшедшие ночи» почти исчезли. Благодаря community мероприятиям. Это не люди их остановили. Это сами духи устали от мелких пакостей. Теперь у них другие планы.",
+                    "Хэллоуин — смешение традиций. Кельтской, римской, христианской. Но самая древняя традиция — жертвоприношение. Ты не отдаешь урожай или животное. Ты отдаешь свою маску. Свое лицо."];
+        
+        // Хэллоуинские цвета
+        const halloweenColors = [
+            '#1a0000', '#330000', '#4d0000', '#660000', '#800000',
+            '#990000', '#b30000', '#cc0000', '#330033', '#4d004d'
+        ];
+        
+        let currentColorIndex = 0;
+        let currentFactIndex = 0;
+        let particles = [];
+        let bats = [];
+        let silhouettes = [];
+        
+        // Типы частиц
+        const particleTypes = ['spark', 'spirit', 'ember', 'magic', 'web'];
+        
+        // Функция для поиска ВСЕХ mp3 файлов
+        async function findAllMP3Files() {
+            musicInfo.textContent = "Идет поиск mp3 файлов...";
+            
+            try {
+                // Попробуем получить список файлов через File System Access API (современные браузеры)
+                if ('showOpenFilePicker' in window) {
+                    return await findMP3FilesModern();
+                } else {
+                    // Fallback метод - ищем файлы с известными именами
+                    return await findMP3FilesFallback();
+                }
+            } catch (error) {
+                console.log("Ошибка поиска файлов:", error);
+                return await findMP3FilesFallback();
+            }
+        }
+        
+        // Современный метод через File System Access API
+        async function findMP3FilesModern() {
+            try {
+                const handles = await window.showOpenFilePicker({
+                    multiple: true,
+                    types: [{
+                        description: 'MP3 Files',
+                        accept: {'audio/mpeg': ['.mp3']}
+                    }]
+                });
+                
+                const files = [];
+                for (const handle of handles) {
+                    const file = await handle.getFile();
+                    files.push({
+                        name: file.name,
+                        url: URL.createObjectURL(file)
+                    });
+                }
+                return files;
+            } catch (error) {
+                // Пользователь отменил выбор файлов
+                return [];
+            }
+        }
+        
+        // Fallback метод - ищем файлы по шаблону
+        async function findMP3FilesFallback() {
+            const foundFiles = [];
+            
+            // Попробуем найти файлы с разными именами
+            const testFiles = [];
+            
+            // Генерируем возможные имена файлов
+            for (let i = 1; i <= 10; i++) {
+                testFiles.push(`music${i}.mp3`);
+                testFiles.push(`track${i}.mp3`);
+                testFiles.push(`song${i}.mp3`);
+                testFiles.push(`audio${i}.mp3`);
+            }
+            
+            // Добавляем распространенные имена
+            testFiles.push('music.mp3', 'background.mp3', 'soundtrack.mp3', 'halloween.mp3', 'spooky.mp3');
+            
+            // Проверяем каждый файл
+            for (const filename of testFiles) {
+                try {
+                    const exists = await checkFileExists(filename);
+                    if (exists) {
+                        foundFiles.push({
+                            name: filename,
+                            url: filename
+                        });
+                    }
+                } catch (e) {
+                    // Пропускаем файл если ошибка
+                }
+            }
+            
+            return foundFiles;
+        }
+        
+        // Функция для проверки существования файла
+        function checkFileExists(url) {
+            return new Promise((resolve) => {
+                const xhr = new XMLHttpRequest();
+                xhr.open('HEAD', url, true);
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        resolve(xhr.status === 200);
+                    }
+                };
+                xhr.onerror = function() {
+                    resolve(false);
+                };
+                xhr.send();
+            });
+        }
+        
+        // Функция для ручного выбора файлов
+        async function selectMusicFiles() {
+            if (!('showOpenFilePicker' in window)) {
+                musicInfo.textContent = "Ваш браузер не поддерживает выбор файлов. Положите mp3 файлы в папку с названиями: music.mp3, track1.mp3 и т.д.";
+                return;
+            }
+            
+            try {
+                const files = await findAllMP3Files();
+                if (files.length > 0) {
+                    musicFiles = files;
+                    updateTrackList();
+                    musicInfo.textContent = `Найдено ${files.length} треков`;
+                    initAudio();
+                } else {
+                    musicInfo.textContent = "Файлы не выбраны";
+                }
+            } catch (error) {
+                musicInfo.textContent = "Ошибка выбора файлов";
+            }
+        }
+        
+        // Функция для автоматического поиска mp3 файлов
+        async function autoFindMP3Files() {
+            musicInfo.textContent = "Автопоиск mp3 файлов...";
+            
+            // Сначала пробуем fallback метод
+            let files = await findMP3FilesFallback();
+            
+            if (files.length === 0) {
+                musicInfo.textContent = " ";
+                musicButton.textContent = "Выбрать музыку";
+            } else {
+                musicFiles = files;
+                updateTrackList();
+                musicInfo.textContent = `Автоматически найдено ${files.length} треков`;
+                initAudio();
+                musicButton.textContent = "Включить музыку";
+            }
+        }
+        
+        // Функция для обновления списка треков
+        function updateTrackList() {
+            trackList.innerHTML = '';
+            musicFiles.forEach((file, index) => {
+                const trackItem = document.createElement('div');
+                trackItem.className = 'track-item';
+                trackItem.textContent = `${index + 1}. ${file.name}`;
+                trackItem.addEventListener('click', () => {
+                    playTrack(index);
+                });
+                trackList.appendChild(trackItem);
+            });
+        }
+        
+        // Функция для инициализации аудио
+        function initAudio() {
+            if (musicFiles.length === 0) return;
+            
+            if (!audio) {
+                audio = new Audio();
+                
+                audio.addEventListener('ended', function() {
+                    currentTrackIndex = (currentTrackIndex + 1) % musicFiles.length;
+                    playTrack(currentTrackIndex);
+                });
+                
+                audio.addEventListener('loadeddata', function() {
+                    updateActiveTrack();
+                });
+            }
+            
+            // Загружаем первый трек
+            loadTrack(0);
+        }
+        
+        // Функция для загрузки трека
+        function loadTrack(index) {
+            if (musicFiles.length > 0 && index < musicFiles.length) {
+                audio.src = musicFiles[index].url;
+                currentTrackIndex = index;
+            }
+        }
+        
+        // Функция для воспроизведения конкретного трека
+        function playTrack(index) {
+            if (musicFiles.length === 0) return;
+            
+            loadTrack(index);
+            audio.play().then(() => {
+                isPlaying = true;
+                musicButton.textContent = "Пауза";
+                updateActiveTrack();
+            }).catch(e => {
+                console.log('Ошибка воспроизведения:', e);
+                musicInfo.textContent = 'Ошибка воспроизведения';
+            });
+        }
+        
+        // Функция для обновления активного трека в списке
+        function updateActiveTrack() {
+            const trackItems = trackList.querySelectorAll('.track-item');
+            trackItems.forEach((item, index) => {
+                if (index === currentTrackIndex) {
+                    item.classList.add('active');
+                } else {
+                    item.classList.remove('active');
+                }
+            });
+        }
+        
+        // Функция для переключения музыки
+        function toggleMusic() {
+            if (musicFiles.length === 0) {
+                selectMusicFiles();
+                return;
+            }
+            
+            if (!audio) return;
+            
+            if (isPlaying) {
+                audio.pause();
+                musicButton.textContent = "Продолжить";
+                isPlaying = false;
+            } else {
+                audio.play().catch(e => {
+                    console.log('Ошибка воспроизведения:', e);
+                    musicInfo.textContent = 'Ошибка воспроизведения';
+                });
+                musicButton.textContent = "Пауза";
+                isPlaying = true;
+            }
+        }
+        
+        // Остальной код без изменений...
+        // [Здесь должен быть весь остальной код из предыдущей версии]
+        // Функция для получения цвета с учетом интенсивности
+        function getColorWithIntensity(color) {
+            if (intensity === 1) return color;
+            
+            const r = parseInt(color.slice(1, 3), 16);
+            const g = parseInt(color.slice(3, 5), 16);
+            const b = parseInt(color.slice(5, 7), 16);
+            
+            const newR = Math.round(r * intensity);
+            const newG = Math.round(g * intensity);
+            const newB = Math.round(b * intensity);
+            
+            return `#${newR.toString(16).padStart(2, '0')}${newG.toString(16).padStart(2, '0')}${newB.toString(16).padStart(2, '0')}`;
+        }
+        
+        // Класс для управления частицами
+        class Particle {
+            constructor() {
+                this.type = particleTypes[Math.floor(Math.random() * particleTypes.length)];
+                this.element = document.createElement('div');
+                this.element.className = `particle ${this.type}`;
+                
+                // Размеры частиц
+                const sizes = {
+                    'spark': { min: 3, max: 8 },
+                    'spirit': { min: 10, max: 25 },
+                    'ember': { min: 5, max: 15 },
+                    'magic': { min: 8, max: 20 },
+                    'web': { min: 15, max: 40 }
+                };
+                
+                this.size = Math.random() * (sizes[this.type].max - sizes[this.type].min) + sizes[this.type].min;
+                
+                // Начальная позиция
+                this.x = Math.random() * window.innerWidth;
+                this.y = Math.random() * window.innerHeight;
+                
+                // Скорость и направление
+                this.vx = (Math.random() - 0.5) * 2;
+                this.vy = (Math.random() - 0.5) * 2;
+                
+                // Дополнительные параметры для разных типов
+                this.oscillation = Math.random() * 0.1;
+                this.oscillationSpeed = Math.random() * 0.05 + 0.02;
+                this.rotation = 0;
+                this.rotationSpeed = (Math.random() - 0.5) * 4;
+                this.scale = 1;
+                this.scaleSpeed = Math.random() * 0.02 + 0.01;
+                this.life = 1;
+                this.lifeDecay = Math.random() * 0.002 + 0.001;
+                
+                this.applyStyles();
+                document.body.appendChild(this.element);
+            }
+            
+            applyStyles() {
+                this.element.style.width = `${this.size}px`;
+                this.element.style.height = `${this.size}px`;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.transform = `translate(-50%, -50%) rotate(${this.rotation}deg) scale(${this.scale})`;
+                
+                const baseOpacity = Math.random() * 0.6 + 0.2;
+                this.element.style.opacity = baseOpacity * intensity * this.life;
+            }
+            
+            update() {
+                // Движение
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Осцилляция для плавного движения
+                this.vx += Math.sin(Date.now() * this.oscillationSpeed) * this.oscillation;
+                this.vy += Math.cos(Date.now() * this.oscillationSpeed) * this.oscillation;
+                
+                // Вращение
+                this.rotation += this.rotationSpeed;
+                
+                // Пульсация масштаба
+                this.scale = 1 + Math.sin(Date.now() * this.scaleSpeed) * 0.3;
+                
+                // Уменьшение жизни
+                this.life -= this.lifeDecay;
+                
+                // Отскок от границ
+                if (this.x < 0 || this.x > window.innerWidth) this.vx *= -1;
+                if (this.y < 0 || this.y > window.innerHeight) this.vy *= -1;
+                
+                // Применение стилей
+                this.applyStyles();
+                
+                // Удаление если жизнь закончилась
+                if (this.life <= 0) {
+                    this.destroy();
+                    return false;
+                }
+                return true;
+            }
+            
+            destroy() {
+                if (this.element.parentNode) {
+                    this.element.parentNode.removeChild(this.element);
+                }
+            }
+        }
+        
+        // Класс для управления летучими мышами
+        class Bat {
+            constructor() {
+                this.element = document.createElement('div');
+                this.element.className = 'bat';
+                
+                this.size = Math.random() * 20 + 20;
+                this.x = Math.random() * window.innerWidth;
+                this.y = Math.random() * window.innerHeight;
+                
+                this.vx = (Math.random() - 0.5) * 4;
+                this.vy = (Math.random() - 0.5) * 4;
+                
+                this.flapSpeed = Math.random() * 0.1 + 0.05;
+                this.flapPhase = Math.random() * Math.PI * 2;
+                
+                this.life = 1;
+                this.lifeDecay = Math.random() * 0.001 + 0.0005;
+                
+                this.applyStyles();
+                document.body.appendChild(this.element);
+            }
+            
+            applyStyles() {
+                this.element.style.width = `${this.size}px`;
+                this.element.style.height = `${this.size * 0.6}px`;
+                this.element.style.left = `${this.x}px`;
+                this.element.style.top = `${this.y}px`;
+                this.element.style.opacity = 0.7 * intensity * this.life;
+                
+                // Анимация взмахов крыльев
+                const flap = Math.sin(Date.now() * this.flapSpeed + this.flapPhase) * 0.2 + 0.8;
+                this.element.style.transform = `scale(${flap})`;
+            }
+            
+            update() {
+                // Движение
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // Плавное изменение направления
+                this.vx += (Math.random() - 0.5) * 0.1;
+                this.vy += (Math.random() - 0.5) * 0.1;
+                
+                // Ограничение скорости
+                const speed = Math.sqrt(this.vx * this.vx + this.vy * this.vy);
+                if (speed > 3) {
+                    this.vx = (this.vx / speed) * 3;
+                    this.vy = (this.vy / speed) * 3;
+                }
+                
+                // Отскок от границ
+                if (this.x < -50) this.x = window.innerWidth + 50;
+                if (this.x > window.innerWidth + 50) this.x = -50;
+                if (this.y < -50) this.y = window.innerHeight + 50;
+                if (this.y > window.innerHeight + 50) this.y = -50;
+                
+                // Уменьшение жизни
+                this.life -= this.lifeDecay;
+                
+                // Применение стилей
+                this.applyStyles();
+                
+                // Удаление если жизнь закончилась
+                if (this.life <= 0) {
+                    this.destroy();
+                    return false;
+                }
+                return true;
+            }
+            
+            destroy() {
+                if (this.element.parentNode) {
+                    this.element.parentNode.removeChild(this.element);
+                }
+            }
+        }
+        
+        // Функция для создания частиц
+        function createParticle() {
+            particles.push(new Particle());
+        }
+        
+        // Функция для создания летучих мышей
+        function createBat() {
+            bats.push(new Bat());
+        }
+        
+        // Функция для создания силуэтов
+        function createSilhouette() {
+            const silhouette = document.createElement('div');
+            silhouette.className = 'silhouette';
+            silhouette.style.left = Math.random() * 80 + 10 + '%';
+            silhouette.style.opacity = Math.random() * 0.3 + 0.1;
+            silhouette.style.transform = `scale(${Math.random() * 0.5 + 0.5})`;
+            document.body.appendChild(silhouette);
+            silhouettes.push(silhouette);
+            
+            // Удаление через случайное время
+            setTimeout(() => {
+                if (silhouette.parentNode) {
+                    silhouette.parentNode.removeChild(silhouette);
+                    silhouettes = silhouettes.filter(s => s !== silhouette);
+                }
+            }, Math.random() * 10000 + 5000);
+        }
+        
+        // Функция анимации частиц
+        function animateParticles() {
+            particles = particles.filter(particle => particle.update());
+            bats = bats.filter(bat => bat.update());
+            requestAnimationFrame(animateParticles);
+        }
+        
+        // Функция для показа фактов
+        function showFact() {
+            const fact = halloweenFacts[currentFactIndex];
+            factElement.textContent = fact;
+            
+            // Плавное появление
+            setTimeout(() => {
+                factElement.style.opacity = 1;
+                factElement.classList.add('flicker');
+            }, 100);
+            
+            // Плавное исчезновение
+            setTimeout(() => {
+                factElement.style.opacity = 0;
+                factElement.classList.remove('flicker');
+            }, 25000);
+            
+            // Переход к следующему факту
+            setTimeout(() => {
+                currentFactIndex = (currentFactIndex + 1) % halloweenFacts.length;
+                showFact();
+            }, 30000);
+        }
+        
+        // Функция для плавной смены цвета
+        function changeColor() {
+            currentColorIndex = (currentColorIndex + 1) % halloweenColors.length;
+            const baseColor = halloweenColors[currentColorIndex];
+            const adjustedColor = getColorWithIntensity(baseColor);
+            body.style.backgroundColor = adjustedColor;
+            
+            setTimeout(changeColor, 4000);
+            
+            if (Math.random() < 0.2) {
+                setTimeout(flashEffect, Math.random() * 2000 + 1000);
+            }
+            
+            if (Math.random() < 0.15) {
+                setTimeout(showGhost, Math.random() * 3000);
+            }
+            
+            if (Math.random() < 0.1) {
+                createSilhouette();
+            }
+        }
+        
+        // Функция для эффекта вспышки
+        function flashEffect() {
+            flash.style.opacity = 0.9 * intensity;
+            setTimeout(() => {
+                flash.style.opacity = 0;
+            }, 100);
+            
+            if (Math.random() < 0.4) {
+                setTimeout(() => {
+                    flash.style.opacity = 0.7 * intensity;
+                    setTimeout(() => {
+                        flash.style.opacity = 0;
+                    }, 50);
+                }, 200);
+            }
+        }
+        
+        // Функция для показа призрака
+        function showGhost() {
+            const ghost = document.createElement('div');
+            ghost.className = 'ghost';
+            ghost.innerHTML = '👻';
+            ghost.style.left = Math.random() * 80 + 10 + '%';
+            ghost.style.top = Math.random() * 80 + 10 + '%';
+            ghost.style.fontSize = (Math.random() * 4 + 3) + 'rem';
+            ghost.style.opacity = 0;
+            document.body.appendChild(ghost);
+            
+            // Появление
+            setTimeout(() => {
+                ghost.style.opacity = 0.8 * intensity;
+                ghost.style.transform = 'scale(1) rotate(0deg)';
+            }, 100);
+            
+            // Исчезновение
+            setTimeout(() => {
+                ghost.style.opacity = 0;
+                ghost.style.transform = 'scale(0.8) rotate(10deg)';
+                setTimeout(() => {
+                    if (ghost.parentNode) {
+                        ghost.parentNode.removeChild(ghost);
+                    }
+                }, 500);
+            }, 1500);
+        }
+        
+        // Обработчик изменения ползунка
+        intensitySlider.addEventListener('input', function() {
+            intensity = parseFloat(this.value);
+            const currentBaseColor = halloweenColors[currentColorIndex];
+            const adjustedColor = getColorWithIntensity(currentBaseColor);
+            body.style.backgroundColor = adjustedColor;
+        });
+        
+        // Обработчик кнопки музыки
+        musicButton.addEventListener('click', toggleMusic);
+        
+        // Начальная настройка
+        function init() {
+            // Автопоиск музыки
+            autoFindMP3Files();
+            
+            // Начинаем показ фактов
+            setTimeout(showFact, 1000);
+            
+            // Начинаем смену цветов
+            setTimeout(changeColor, 1000);
+            
+            // Создаем частицы
+            setInterval(createParticle, 200);
+            
+            // Создаем летучих мышей
+            setInterval(createBat, 3000);
+            
+            // Создаем силуэты
+            setInterval(createSilhouette, 8000);
+            
+            // Запускаем анимацию
+            animateParticles();
+            
+            // Начальная вспышка
+            setTimeout(flashEffect, 500);
+        }
+        
+        // Запускаем при загрузке
+        window.onload = init;
+    </script>
+</body>
+</html>
